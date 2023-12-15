@@ -59,7 +59,9 @@ RUN apt list --installed
 # RUN curl -vsSLO https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 # RUN curl -vsSLO https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb 
 
-# RUN apt-get install -y ./google-chrome-stable_current_amd64.deb
+
+
+RUN apt-get install -y ./google-chrome-stable_current_amd64.deb
 # save space
 # RUN rm google-chrome-stable_current_amd64.deb
 

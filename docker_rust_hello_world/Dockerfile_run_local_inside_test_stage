@@ -38,6 +38,17 @@ RUN set -eux; \
 
 
 FROM debian:bullseye-slim as app
+
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+    procps \
+    ca-certificates \
+    gcc \
+    libc6-dev \
+    wget 
+
+
 RUN mkdir -p /usr/local/cargo/bin
 COPY --from=rust_installer /usr/local /usr/local
 
@@ -54,6 +65,27 @@ ENV RUSTUP_HOME /usr/local/rustup
 ENV PATH /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/cargo/bin
 RUN chmod -R a+w $RUSTUP_HOME $CARGO_HOME; 
 
+# run_local_inside
+# 0. need  local user with sudo
+# define a USER
+# Environment variables for user
+ENV PUID='1000'
+ENV PGID='1000'
+ENV USER='user'
+
+# create user $USER
+RUN addgroup --gid "$PGID" "$USER" && \
+    adduser --gecos '' --disabled-password --uid "$PUID" --gid "$PGID" "$USER"
+# add $USER to sudo
+RUN mkdir -p /etc/sudoers.d 
+RUN echo "user ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/user \
+    && chmod 0440 /etc/sudoers.d/user
+
+
+# 1. create dummy project
+# 2. copy local to docker
+# 3. build inside
+# 4. run inside
 
 # RUN export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/cargo/bin"
 # RUN rustup --version; \
@@ -61,10 +93,10 @@ RUN chmod -R a+w $RUSTUP_HOME $CARGO_HOME;
 #    rustc --version; 
 
 # build 
-# cd debian-bullseye-slim &&  docker build --progress=plain -t debian-bullseye-slim-multi-stage-rust -f Dockerfile_multi_stage "."
+# cd docker_rust_hello_world &&  docker build --progress=plain -t docker_run_rust_local_inside -f Dockerfile_run_local_inside "."
 
 # run shell bash
-# docker run -it debian-bullseye-slim-multi-stage-rust bash
+# docker run -it docker_run_rust_local_inside bash
 
 # run shell sh
-# docker run -it debian-bullseye-slim-multi-stage-rust sh
+# docker run -it docker_run_rust_local_inside sh

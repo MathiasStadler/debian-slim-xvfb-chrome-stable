@@ -1,7 +1,7 @@
 # FROM debian:11.8-slim
 
 FROM debian:11.8
-# Environment variables
+# Environment variables for user
 ENV PUID='1000'
 ENV PGID='1000'
 ENV USER='user'
