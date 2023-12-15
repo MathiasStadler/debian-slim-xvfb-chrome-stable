@@ -43,9 +43,13 @@ COPY --from=rust_installer /usr/local /usr/local
 # put rust path in shell
 RUN echo export PATH="\"$PATH:/usr/local/cargo/bin\"" >> /etc/profile
 RUN echo export PATH="\"$PATH:/usr/local/cargo/bin\"" >> /etc/bash.bashrc
+# for sh
+RUN echo PATH="\"$PATH:/usr/local/cargo/bin\"" >> /etc/environment
+
 
 ENV CARGO_HOME /usr/local/cargo
 ENV RUSTUP_HOME /usr/local/rustup
+ENV PATH /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/cargo/bin
 RUN chmod -R a+w $RUSTUP_HOME $CARGO_HOME; 
 
 
