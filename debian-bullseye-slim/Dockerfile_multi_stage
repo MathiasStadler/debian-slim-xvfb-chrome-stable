@@ -33,7 +33,7 @@ RUN set -eux; \
     apt-get remove -y --auto-remove \
         wget \
         ; \
-    rm -rf /var/lib/apt/lists/*;
+    rm -rf ls ;
 
 
 FROM debian:bullseye-slim as app
@@ -42,14 +42,20 @@ COPY --from=rust_installer /usr/local /usr/local
 
 # put rust path in shell
 RUN echo export PATH="\"$PATH:/usr/local/cargo/bin\"" >> /etc/profile
+RUN echo export PATH="\"$PATH:/usr/local/cargo/bin\"" >> /etc/bash.bashrc
 
 ENV CARGO_HOME /usr/local/cargo
 ENV RUSTUP_HOME /usr/local/rustup
 RUN chmod -R a+w $RUSTUP_HOME $CARGO_HOME; 
 
+
+# RUN export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/cargo/bin"
 # RUN rustup --version; \
 #    cargo --version; \
 #    rustc --version; 
 
 # build 
-# cd debian-bullseye-slim &&  docker build -t debian-bullseye-slim-rust -f Dockerfile "."
+# cd debian-bullseye-slim &&  docker build --progress=plain -t debian-bullseye-slim-stage-rust -f Dockerfile_multi_stage "."
+
+# run
+# docker run -it debian-bullseye-slim-stage-rust bash

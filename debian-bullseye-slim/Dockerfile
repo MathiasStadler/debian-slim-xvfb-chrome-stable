@@ -38,3 +38,6 @@ RUN set -eux; \
 
 # build 
 # cd debian-bullseye-slim &&  docker build -t debian-bullseye-slim-rust -f Dockerfile "."
+
+# run
+# docker run -it debian-bullseye-slim-rust bash
