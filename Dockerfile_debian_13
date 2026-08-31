@@ -1,0 +1,82 @@
+# FROM debian:11.8-slim
+
+# FROM debian:11.8
+FROM debian:13.6
+# Environment variables
+ENV PUID='1000'
+ENV PGID='1000'
+ENV USER='user'
+
+# x downlaods
+RUN apt-get update && apt-get install -yqq xvfb \
+    adduser \
+    x11vnc \
+    bash \
+    vim \
+    htop \
+    sudo \
+    fluxbox \
+    x11-utils # for xdpyinfo \
+    bash \
+    vim \
+    terminus-font \
+    curl \
+    # wget \
+    ca-certificates \
+    unzip \
+    tzdata
+
+# clean up
+RUN apt-get autoremove -y \
+    && apt-get clean -y \
+    && apt-get autoclean -y \
+    && rm -rf /var/lib/apt/lists/*
+
+# create user $USER
+RUN addgroup --gid "$PGID" "$USER" && \
+    adduser --gecos '' --disabled-password --uid "$PUID" --gid "$PGID" "$USER"
+
+# add $USER to sudo
+RUN mkdir -p /etc/sudoers.d 
+RUN echo "user ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/user \
+    && chmod 0440 /etc/sudoers.d/user
+
+# install rust last stable version
+ENV RUSTUP_HOME=/usr/local/rustup \
+    CARGO_HOME=/usr/local/cargo \
+    PATH=/usr/local/cargo/bin:$PATH \
+    RUST_VERSION=1.74.0 \
+    RUST_ARCH=x86_64-unknown-linux-gnu
+
+
+
+
+RUN  curl --verbose --output-document=rustup-init https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init 
+
+RUN set -eux; echo "7aa9e2a380a9958fc1fc426a3323209b2c86181c6816640979580f62ff7d48d4 *rustup-init" | sha256sum -c -; 
+
+
+RUN chmod +x rustup-init; \
+    ls -la rustup-init; \
+    ./rustup-init -y --no-modify-path --profile default --default-toolchain stable --default-host x86_64-unknown-linux-gnu; \
+    chmod -R a+w $RUSTUP_HOME $CARGO_HOME; \
+    rustup --version; \
+    cargo --version; \
+    rustc --version; \
+    rm rustup-init; 
+
+
+RUN mkdir -p /opt
+
+COPY bootstrap.sh /opt
+
+# put rust path in shell
+RUN echo PATH="\"$PATH:/usr/local/cargo/bin\"" >> /etc/profile
+
+# change to user
+USER $USER
+
+ENV HOME /home/$USER
+WORKDIR /home/$USER
+
+CMD ["sh","/opt/bootstrap.sh"]    
