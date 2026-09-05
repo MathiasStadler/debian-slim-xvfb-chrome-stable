@@ -45,7 +45,7 @@ launch_window_manager() {
 }
 
 run_vnc_server() {
-    local passwordArgument='-nopw'
+    local passwordArgument='-nopw -nossl'
 
     if [ -n "${VNC_SERVER_PASSWORD}" ]
     then

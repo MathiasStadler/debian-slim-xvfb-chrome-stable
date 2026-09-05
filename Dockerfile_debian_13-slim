@@ -36,6 +36,9 @@ RUN apt-get autoremove -y \
 RUN addgroup --gid "$PGID" "$USER" && \
     adduser --gecos '' --disabled-password --uid "$PUID" --gid "$PGID" "$USER"
 
+# set/change user passwd for vncviewer
+RUN echo "${USER}:user" | chpasswd
+
 # add $USER to sudo
 RUN mkdir -p /etc/sudoers.d 
 RUN echo "user ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/user \
